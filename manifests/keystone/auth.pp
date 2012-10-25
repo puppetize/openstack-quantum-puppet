@@ -12,7 +12,6 @@ class quantum::keystone::auth (
   $region             = 'RegionOne'
 ) {
 
-  Class['keystone::db::sync'] -> Class['quantum::keystone::auth']
   Keystone_user_role["${auth_name}@services"] ~> Service <| name == 'quantum-server' |>
 
   keystone_user { $auth_name:
@@ -32,7 +31,7 @@ class quantum::keystone::auth (
   }
 
   if $configure_endpoint {
-    keystone_endpoint { $auth_name:
+    keystone_endpoint { "${region}/$auth_name":
       ensure       => present,
       region       => $region,
       public_url   => "http://${public_address}:${port}",
