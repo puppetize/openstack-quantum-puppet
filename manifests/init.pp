@@ -27,11 +27,23 @@ class quantum (
   Package['quantum'] -> Quantum_config<||>
 
   if ($sql_connection =~ /mysql:\/\/\S+:\S+@\S+\/\S+/) {
-    ensure_resource( 'package', 'python-mysqldb', {'ensure' => 'present'})
+    if ! defined(Package['python-mysqldb']) {
+      package { 'python-mysqldb':
+        ensure => present,
+      }
+    }
   } elsif ($sql_connection =~ /postgresql:\/\/\S+:\S+@\S+\/\S+/) {
-    ensure_resource( 'package', 'python-psycopg2', {'ensure' => 'present'})
+    if ! defined(Package['python-psycopg2']) {
+      package { 'python-psycopg2':
+        ensure => present,
+      }
+    }
   } elsif($sql_connection =~ /sqlite:\/\//) {
-    ensure_resource( 'package', 'python-pysqlite2', {'ensure' => 'present'})
+    if ! defined(Package['python-pysqlite2']) {
+      package { 'python-pysqlite2':
+        ensure => present,
+      }
+    }
   } else {
     fail("Invalid db connection ${sql_connection}")
   }
