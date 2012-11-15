@@ -23,22 +23,22 @@ class quantum::agents::ovs (
   vs_bridge {$integration_bridge:
     external_ids => "bridge-id=${ingration_bridge}",
     ensure       => present,
-    require      => Service['quantum-plugin-ovs-service'],
+    before       => Service['quantum-plugin-ovs-service'],
   }
 
   if $enable_tunneling {
     vs_bridge {$tunnel_bridge:
       external_ids => "bridge-id=${tunnel_bridge}",
       ensure       => present,
-      require      => Service['quantum-plugin-ovs-service'],
+      before       => Service['quantum-plugin-ovs-service'],
     }
   }
 
   quantum::plugins::ovs::bridge{$bridge_mappings:
-    require      => Service['quantum-plugin-ovs-service'],
+    before => Service['quantum-plugin-ovs-service'],
   }
   quantum::plugins::ovs::port{$bridge_uplinks:
-    require      => Service['quantum-plugin-ovs-service'],
+    before => Service['quantum-plugin-ovs-service'],
   }
 
   package { 'quantum-plugin-ovs-agent':
@@ -55,6 +55,8 @@ class quantum::agents::ovs (
   quantum_plugin_ovs {
     'OVS/local_ip': value => $local_ip;
   }
+
+  Quantum_plugin_ovs<||> ~> Service['quantum-plugin-ovs-service']
 
   service { 'quantum-plugin-ovs-service':
     name    => $::quantum::params::ovs_agent_service,
